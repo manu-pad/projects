@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>DIUBI | Delete</title>
+        <link rel="stylesheet" href="styles">
+    </head>
+    <body>
+        <h1>Eliminar Dados | UBI</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="ver_dados">Ver Dados</a></li>
+                <li><a href="criar_dados">Criar Dados</a></li>
+                <li><a href="mudar_dados">Mudar Dados</a></li>
+                <li><a href="eliminar_dados" class="selected">Eliminar Dados</a></li>
+                <li><a href="ver_creditos">Ver Créditos</a></li>
+            </ul>
+        </nav>
+        <main>
+            <section>
+                <h2>Eliminar Dados</h2>
+                <hr><br>
+                <div class="escolha">
+                    <button id="projeto" type="button">Projeto</button>
+                    <button id="serviço" type="button">Prestação de Serviço</button>
+                </div>
+                <div class="escolhaProjeto">
+                    <h3>Escolha um Projeto.</h3>
+
+                    <form>
+                        <h2>Projeto</h2>
+                        Projeto: <!--(NomeProjeto)--> 
+                        <select name="Projeto" id="projetoSelect">
+                            <option value="">Selecione Um Projeto</option> 
+                            <!-- Buscar valores à base de dados -->
+                        </select><br>
+                    </form>
+                </div>
+                <div class="escolhaServiço">
+                    <h3>Escolha um Prestação de Serviço.</h3>
+
+                    <form>
+                        <h2>Prestação de Serviço</h2>
+                        Prestação de Serviço: <!--(NomeServiço)--> 
+                        <select name="PrestaçãoServiço" id="servicoSelect">
+                            <option value="">Selecione Um Serviço</option> 
+                            <!-- Buscar valores à base de dados -->
+                        </select><br>
+                    </form>
+                </div>
+            </section>
+        </main>
+        <script>
+            async function fetchServices() {
+                try {
+                  const response = await fetch('/api/getPrestServicos');
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+                  const projects = await response.json();
+                  $('#servicoSelect').empty();
+                  const dropdown = document.getElementById('servicoSelect');
+                  const option = document.createElement('option');
+                  option.value = "";
+                  option.text = 'Selecione Um Serviço';
+                  dropdown.appendChild(option);
+                  projects.forEach(project => {
+                    const option = document.createElement('option');
+                    option.value = project.IdPrestacaoServico;
+                    option.text = `${project.NomePrestacaoServico}`;
+                    dropdown.add(option);
+                  });
+                } catch (error) {
+                  console.error('Failed to fetch projects:', error);
+                }
+            }
+
+            async function fetchEverything() {
+                fetchServices()
+                try {
+                  const response = await fetch('/api/getProjetos');
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+                  const projects = await response.json();
+                  $('#projetoSelect').empty();
+                  const dropdown = document.getElementById('projetoSelect');
+                  const option = document.createElement('option');
+                  option.value = "";
+                  option.text = 'Selecione Um Projeto';
+                  dropdown.appendChild(option);
+                  projects.forEach(project => {
+                    const option = document.createElement('option');
+                    option.value = project.IdProjeto;
+                    option.text = `${project.NomeProjeto}`;
+                    dropdown.add(option);
+                  });
+                } catch (error) {
+                  console.error('Failed to fetch projects:', error);
+                }
+            }
+
+            const projetoBtn = document.getElementById('projeto');
+            const serviçoBtn = document.getElementById('serviço');
+            const escolhaProjetoDiv = document.querySelector('.escolhaProjeto');
+            const escolhaServiçoDiv = document.querySelector('.escolhaServiço');
+
+            projetoBtn.addEventListener('click', () => {
+                escolhaProjetoDiv.style.display = 'block';
+                escolhaServiçoDiv.style.display = 'none';
+                fetchEverything();
+            });
+
+            serviçoBtn.addEventListener('click', () => {
+                escolhaServiçoDiv.style.display = 'block';
+                escolhaProjetoDiv.style.display = 'none';
+                fetchEverything();
+            });
+
+            window.onload = fetchEverything;
+        </script>
+    </body>
+    <script src="index.js"></script>
+</html>
